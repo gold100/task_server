@@ -1,0 +1,8 @@
+export enum TaskErrorMessage{
+    NO_TASKS,
+    TASK_NOT_EXISTS,
+    UPDATE_STATUS_ERROR,
+    SAME_NAME_ERROR,
+    UPDATE_COMPLETED_TASK,
+    UNDO_INCOMPLETE
+}
