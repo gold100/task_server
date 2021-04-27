@@ -34,8 +34,8 @@ export class TaskController {
     return this.taskService.updateStatus(data.body);
   }
 
-  @Delete(':name')
-  async delete(@Param('name') name) {
-    return this.taskService.deleteTask(name);
+  @Post('deleteTask')
+  async delete(@Body() data: any) {
+    return this.taskService.deleteTask(data.body);
   }
 }
