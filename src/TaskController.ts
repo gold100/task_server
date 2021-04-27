@@ -1,7 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { ChangeStausDTO } from './Entities/ChangeStausDTO';
-import { ChangeMetaDataDTO } from './Entities/ChangeMetaDataDTO';
-import { TaskService } from './TaskService';
+import { TaskService } from './BL/TaskService';
 
 @Controller('task')
 export class TaskController {

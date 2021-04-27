@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Task } from './Entities/Task';
-import { TaskStatus } from './Entities/TaskStatus';
+import { Task } from '../Entities/Task';
+import { TaskStatus } from '../Entities/TaskStatus';
 
 const loki = require('lokijs'),
   db = new loki('tasks.json');

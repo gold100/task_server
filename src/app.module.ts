@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { TaskService } from './TaskService';
+import { TaskService } from './BL/TaskService';
 import { TaskController } from './TaskController';
-import { TaskRepository } from './task-repository.service';
+import { TaskRepository } from './DAL/task-repository.service';
 
 @Module({
   imports: [],
