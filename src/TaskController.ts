@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { TaskService } from './BL/TaskService';
 
 @Controller('task')
@@ -22,12 +22,12 @@ export class TaskController {
     return this.taskService.addTask(data.body);
   }
 
-  @Post('updateMetadata')
+  @Put('updateMetadata')
   async updateMetadata(@Body() data: any) {
     return this.taskService.updateMetadata(data.body);
   }
 
-  @Post('changeStatus')
+  @Put('changeStatus')
   async changeStatus(@Body() data: any) {
     return this.taskService.updateStatus(data.body);
   }
