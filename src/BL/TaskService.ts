@@ -4,13 +4,12 @@ import { ChangeMetaDataDTO } from '../Entities/ChangeMetaDataDTO';
 import { ChangeStausDTO } from '../Entities/ChangeStausDTO';
 import { ValidationObject } from '../Entities/ValidationObject';
 import { TaskRepository } from '../DAL/task-repository.service';
-import { TaskErrorMessage } from '../Entities/TaskErrorMessage';
-import { TaskStatus } from '../Entities/TaskStatus';
+import { ValidationService } from './ValidationService';
 
 @Injectable()
 export class TaskService{
-
-  constructor(private taskRepo: TaskRepository) {
+  constructor(private taskRepo: TaskRepository,
+              private validationService: ValidationService) {
   }
 
   getTasks(): Task[]{
@@ -22,64 +21,45 @@ export class TaskService{
   }
 
   addTask(taskName: string): ValidationObject{
-    const validation = new ValidationObject();
     const taskFromDb = this.taskRepo.getTask(taskName);
-    if (!taskFromDb){
+    const validation = this.validationService.getTaskAlreadyExistValidation(taskFromDb, new ValidationObject());
+    if (validation.isValid){
       this.taskRepo.addTask(taskName);
-    }else{
-      validation.setError(TaskErrorMessage.SAME_NAME_ERROR);
     }
-
     return validation;
   }
 
   updateMetadata(changeMetaData: ChangeMetaDataDTO): ValidationObject {
-    let validation = new ValidationObject();
-    const taskValidation = this.getTaskValidation(changeMetaData.oldName, validation);
-    validation = taskValidation.validation;
-    if (validation.isValid) {
-      taskValidation.taskFromDb.name = changeMetaData.newName;
-      this.taskRepo.updateTask(taskValidation.taskFromDb);
+    const task = this.taskRepo.getTask(changeMetaData.oldName);
+    const taskValidation = this.validationService.getTaskExistValidation(task, new ValidationObject());
+    if (taskValidation.isValid) {
+      task.name = changeMetaData.newName;
+      this.taskRepo.updateTask(task);
     }
 
-    return validation;
+    return taskValidation;
   }
 
   updateStatus(changeStatusDTO: ChangeStausDTO): ValidationObject {
-    let validation = new ValidationObject();
-    const taskValidation = this.getTaskValidation(changeStatusDTO.name, validation);
-    validation = taskValidation.validation;
-    if (validation.isValid) {
-      if (taskValidation.taskFromDb.status == TaskStatus.Completed && changeStatusDTO.status == TaskStatus.Completed) {
-        validation.setError(TaskErrorMessage.UPDATE_COMPLETED_TASK);
-      } else if (taskValidation.taskFromDb.status == TaskStatus.Open && changeStatusDTO.status == TaskStatus.Open) {
-        validation.setError(TaskErrorMessage.UNDO_INCOMPLETE);
-      } else {
-        taskValidation.taskFromDb.status = changeStatusDTO.status;
-        this.taskRepo.updateTask(taskValidation.taskFromDb);
+    const task = this.taskRepo.getTask(changeStatusDTO.name);
+    let taskValidation = this.validationService.getTaskExistValidation(task, new ValidationObject());
+    if (taskValidation.isValid) {
+      taskValidation = this.validationService.getStatusValidation(changeStatusDTO, task.status, taskValidation);
+      if (taskValidation.isValid) {
+        task.status = changeStatusDTO.status;
+        this.taskRepo.updateTask(task);
       }
     }
-    return validation;
+    return taskValidation;
   }
 
-  deleteTask(taskName: string): ValidationObject{
-    let validation = new ValidationObject();
-    const taskValidation = this.getTaskValidation(taskName, validation);
-    validation = taskValidation.validation;
-    if (validation.isValid){
-      this.taskRepo.deleteTask(taskValidation.taskFromDb);
+  deleteTask(taskName: string): ValidationObject {
+    const task = this.taskRepo.getTask(taskName);
+    const taskValidation = this.validationService.getTaskExistValidation(task, new ValidationObject());
+    if (taskValidation.isValid) {
+      this.taskRepo.deleteTask(task);
     }
 
-    return validation;
-  }
-
-  private getTaskValidation(taskName: string,
-                    validation: ValidationObject){
-    const taskFromDb = this.taskRepo.getTask(taskName);
-    if (!taskFromDb) {
-      validation.setError(TaskErrorMessage.TASK_NOT_EXISTS);
-    }
-
-    return { taskFromDb, validation };
+    return taskValidation;
   }
 }
