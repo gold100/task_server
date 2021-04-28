@@ -7,6 +7,7 @@ The server exposes a rest layer on port 3000, the task url is http://localhost:3
 To run this server please do the following steps:
 
 - npm i -g @nestjs/cli
+- npm install
 - npm run build
 - npm run start
 
