@@ -4,6 +4,7 @@ import { TaskRepository } from '../DAL/task-repository.service';
 import { ChangeStausDTO } from '../Entities/ChangeStausDTO';
 import { TaskStatus } from '../Entities/TaskStatus';
 import { ChangeMetaDataDTO } from '../Entities/ChangeMetaDataDTO';
+import { ValidationService } from './ValidationService';
 
 describe('The Task Service', () => {
   let authenticationService: TaskService;
@@ -12,6 +13,7 @@ describe('The Task Service', () => {
     const module = await Test.createTestingModule({
       providers: [
         TaskService,
+        ValidationService,
         TaskRepository
       ],
     })
